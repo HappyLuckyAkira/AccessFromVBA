@@ -1,0 +1,2 @@
+# AccessFromVBA
+VBAからアクセスできるDLLのサンプルです
