@@ -38,3 +38,17 @@ ACCESSFROMVBA_API void WINAPI DoNothing()
 {
     return;
 }
+
+//int型の値を受け取って、int型の戻り値を返す
+ACCESSFROMVBA_API int WINAPI ReturnInt_Multi2(int i)
+{
+	return i * 2;
+}
+
+//int型の値を受け取って、内部で値を変更して返す
+ACCESSFROMVBA_API void WINAPI ReturnIntByPointerParameter(int* pi)
+{
+	*pi *= 300;
+
+	return;
+}

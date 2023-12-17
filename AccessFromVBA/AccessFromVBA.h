@@ -23,4 +23,6 @@ ACCESSFROMVBA_API int fnAccessFromVBA(void);
 
 extern "C" {
     ACCESSFROMVBA_API void WINAPI DoNothing();
+	ACCESSFROMVBA_API int WINAPI ReturnInt_Multi2(int i);
+	ACCESSFROMVBA_API void WINAPI ReturnIntByPointerParameter(int* pi);
 }

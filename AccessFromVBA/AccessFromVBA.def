@@ -2,3 +2,5 @@ LIBRARY	"AccessFromVBA"
 
 EXPORTS
 	DoNothing
+	ReturnInt_Multi2
+	ReturnIntByPointerParameter
