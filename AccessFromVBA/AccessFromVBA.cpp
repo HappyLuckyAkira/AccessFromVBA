@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 #include "AccessFromVBA.h"
+#include <string>
+#include <comutil.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -51,4 +53,85 @@ ACCESSFROMVBA_API void WINAPI ReturnIntByPointerParameter(int* pi)
 	*pi *= 300;
 
 	return;
+}
+
+
+std::wstring	convVstr2Wstr(const VARIANT v)
+{
+	std::wstring ws;
+
+	if (v.vt == VT_BSTR)
+	{
+		ws = std::wstring(v.bstrVal, SysStringLen(v.bstrVal));
+	}
+	else if (v.vt == (VT_BSTR | VT_BYREF))
+	{
+		ws = std::wstring(*v.pbstrVal, SysStringLen(*v.pbstrVal));
+	}
+
+	return ws;
+}
+
+ACCESSFROMVBA_API void WINAPI SetString(VARIANT vString)
+{
+	if ((vString.vt == VT_BSTR) || (vString.vt == (VT_BSTR | VT_BYREF)))
+	{
+		MessageBox(NULL, convVstr2Wstr(vString).c_str(), L"DLL", MB_OK | MB_ICONINFORMATION);
+	}
+	else
+	{
+		MessageBox(NULL, L"No String Arg.", L"DLL", MB_OK | MB_ICONERROR);
+	}
+
+	return;
+}
+
+ACCESSFROMVBA_API void WINAPI GetStringByParam(VARIANT* pvString)
+{
+	if (!pvString)
+	{
+		return;
+	}
+	
+	std::wstring ws(L"GetStringByParam返却データ");
+	
+	unsigned short vt = pvString->vt;
+
+	VariantClear(pvString);
+
+	if (vt == (VT_BSTR | VT_BYREF))
+	{
+		//VBAから、
+		//GetStringByParam(String)
+		//で呼ばれた場合
+		pvString->vt = vt;
+
+		BSTR bs = SysAllocString(ws.c_str());
+		INT iResult = SysReAllocString(pvString->pbstrVal, bs);
+		SysFreeString(bs);
+	}
+	else if ((vt == VT_BSTR) || (vt == VT_EMPTY))
+	{
+		//VBAから、
+		//GetStringByParam(Variant)
+		//で呼ばれた場合
+		pvString->vt = VT_BSTR;
+		pvString->bstrVal = SysAllocString(ws.c_str());
+
+	}
+
+	return;
+}
+
+ACCESSFROMVBA_API VARIANT WINAPI GetStringByRetVal()
+{
+	std::wstring ws(L"GetStringByRetVal");
+
+	VARIANT vstr;
+
+	VariantInit(&vstr);
+	vstr.vt = VT_BSTR;
+	vstr.bstrVal = SysAllocString(ws.c_str());
+
+	return vstr;
 }

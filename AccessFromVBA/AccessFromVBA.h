@@ -25,4 +25,7 @@ extern "C" {
     ACCESSFROMVBA_API void WINAPI DoNothing();
 	ACCESSFROMVBA_API int WINAPI ReturnInt_Multi2(int i);
 	ACCESSFROMVBA_API void WINAPI ReturnIntByPointerParameter(int* pi);
+	ACCESSFROMVBA_API void WINAPI SetString(VARIANT vString);	
+	ACCESSFROMVBA_API void WINAPI GetStringByParam(VARIANT* pvString);
+	ACCESSFROMVBA_API VARIANT WINAPI GetStringByRetVal();
 }

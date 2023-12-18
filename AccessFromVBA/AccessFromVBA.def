@@ -4,3 +4,6 @@ EXPORTS
 	DoNothing
 	ReturnInt_Multi2
 	ReturnIntByPointerParameter
+	SetString
+	GetStringByParam
+	GetStringByRetVal
