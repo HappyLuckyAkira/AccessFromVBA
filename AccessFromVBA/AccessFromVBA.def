@@ -10,4 +10,8 @@ EXPORTS
 	GetStringByParamS
 	GetStringByRetValS
 	SetStringS
+	SetArrayGE
+	SetArrayAD
+	GetArrayPE
+	GetArrayAD
 	
