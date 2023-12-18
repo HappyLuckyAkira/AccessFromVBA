@@ -7,3 +7,7 @@ EXPORTS
 	SetString
 	GetStringByParam
 	GetStringByRetVal
+	GetStringByParamS
+	GetStringByRetValS
+	SetStringS
+	

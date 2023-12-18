@@ -28,4 +28,7 @@ extern "C" {
 	ACCESSFROMVBA_API void WINAPI SetString(VARIANT vString);	
 	ACCESSFROMVBA_API void WINAPI GetStringByParam(VARIANT* pvString);
 	ACCESSFROMVBA_API VARIANT WINAPI GetStringByRetVal();
+	ACCESSFROMVBA_API void WINAPI GetStringByParamS(BSTR* pbstr);
+	ACCESSFROMVBA_API BSTR WINAPI GetStringByRetValS();
+	ACCESSFROMVBA_API void WINAPI SetStringS(const BSTR sString);
 }

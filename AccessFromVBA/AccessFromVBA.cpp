@@ -135,3 +135,49 @@ ACCESSFROMVBA_API VARIANT WINAPI GetStringByRetVal()
 
 	return vstr;
 }
+
+ACCESSFROMVBA_API void WINAPI GetStringByParamS(BSTR* pbstr)
+{
+    if (!pbstr)
+        return;
+
+    //まず開放
+    SysFreeString(*pbstr);
+
+    //返す文字列（std::wstringは使用しない）
+    std::string sReturn("GetStringByParamS 返却データ文字列");
+
+    //BSTR生成
+    *pbstr = SysAllocStringByteLen(sReturn.c_str(), sReturn.length());
+
+    return;
+}
+
+ACCESSFROMVBA_API BSTR WINAPI GetStringByRetValS()
+{
+    //返す文字列（std::wstringは使用しない）
+    std::string s("GetStringByRetValS 返却データ文字列");
+
+    //BSTR生成
+    BSTR bstr = SysAllocStringByteLen(s.c_str(), s.length());
+
+    return bstr;
+}
+
+ACCESSFROMVBA_API void WINAPI SetStringS(const BSTR sString)
+{
+    if (!sString)
+    {
+        MessageBox(NULL, L"Argment is NULL.", L"DLL", MB_OK | MB_ICONERROR);
+
+        return;
+    }
+
+    //VBAからの文字列は、char*で格納されている
+    //BSTRの途中に'\0'がある事は想定していない。
+    std::string s((char*)sString);
+
+    MessageBoxA(NULL, s.c_str(), "DLL", MB_OK | MB_ICONINFORMATION);
+
+    return;
+}
