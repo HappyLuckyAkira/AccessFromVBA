@@ -293,8 +293,8 @@ ACCESSFROMVBA_API void WINAPI SetArrayGE(const LPSAFEARRAY* ppsa)
                 switch (vValue.vt)
                 {
                 case VT_I4:
-				    _itow_s(vValue.intVal, buffer, 100);
-                    ss << buffer << L"\n";
+					swprintf_s(buffer, L"%f", vValue.intVal);
+					ss << buffer << L"\n";
                     break;
                 case VT_R8:
 					 swprintf_s(buffer, L"%f", vValue.dblVal);
