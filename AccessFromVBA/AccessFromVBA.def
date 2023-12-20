@@ -14,4 +14,5 @@ EXPORTS
 	SetArrayAD
 	GetArrayPE
 	GetArrayAD
-	
+	GetArrayV
+	SetArrayV

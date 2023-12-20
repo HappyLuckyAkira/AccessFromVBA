@@ -754,3 +754,184 @@ std::wstring    convMbcBstr2Wstr(const BSTR& bstr)
 {
     return convMbc2Wstr((const char*)bstr);
 }
+
+ACCESSFROMVBA_API void WINAPI GetArrayV(LPVARIANT pv)
+{
+    if (!(pv->vt & VT_ARRAY))
+    {
+        //配列でなければ処理終了
+        return;
+    }
+
+    UINT uiDims = SafeArrayGetDim(pv->parray);
+
+    if (uiDims != 1)
+    {
+        return;
+    }
+
+    HRESULT hResult;
+    long lUbound;
+    long lLbound;
+
+    hResult = SafeArrayGetLBound(pv->parray, 1, &lLbound);
+    hResult = SafeArrayGetUBound(pv->parray, 1, &lUbound);
+
+    //データ型判定を簡略化するために、VT_ARRAYフラグをOFFする
+    unsigned short vt = pv->vt ^ VT_ARRAY;
+
+    if (vt == VT_I4)
+    {
+        for (long i = lLbound; i <= lUbound; ++i)
+        {
+            long lValue;
+            hResult = SafeArrayGetElement(pv->parray, &i, &lValue);
+
+            if (lValue != 0)
+                lValue *= 2;
+            else
+                lValue = -1;
+
+            hResult = SafeArrayPutElement(pv->parray, &i, &lValue);
+        }
+    }
+    else if (vt == VT_BSTR)
+    {
+        for (long i = lLbound; i <= lUbound; ++i)
+        {
+            BSTR bstr = SysAllocString(L"");
+
+            hResult = SafeArrayGetElement(pv->parray, &i, &bstr);
+
+            std::wstring ws = std::wstring(bstr, SysStringLen(bstr));
+
+            ws += L" GetArrayV ";
+//            ws += std::to_wstring(i);
+			// Convert integer to wide string using swprintf_s
+			wchar_t buffer[20];  // Adjust the buffer size as needed
+			swprintf_s(buffer, L"%ld", i);
+			ws += buffer;
+
+            SysReAllocString(&bstr, ws.c_str());
+
+            hResult = SafeArrayPutElement(pv->parray, &i, bstr);
+
+            SysFreeString(bstr);
+        }
+    }
+
+    return;
+}
+
+ACCESSFROMVBA_API void WINAPI SetArrayV(const LPVARIANT pv)
+{
+    if (pv == NULL || !(pv->vt & VT_ARRAY))
+    {
+        //配列でなければ処理終了
+        return;
+    }
+
+    std::wstringstream ss;
+
+    UINT uiDims = SafeArrayGetDim(pv->parray);
+    ss << L"次元数：" << uiDims << L"\n";
+
+    HRESULT hResult;
+    long* plUbound = new long[uiDims];
+    long* plLbound = new long[uiDims];
+
+    for (UINT i = 0; i < uiDims; ++i)
+    {
+        hResult = SafeArrayGetLBound(pv->parray, i + 1, &plLbound[i]);
+        hResult = SafeArrayGetUBound(pv->parray, i + 1, &plUbound[i]);
+
+        ss << i + 1 << L"次元：" << L"\n"
+            << L"  LBound:" << plLbound[i] << L"\n"
+            << L"  UBound:" << plUbound[i] << L"\n";
+    }
+
+    //データ型判定を簡略化するために、VT_ARRAYフラグをOFFする
+    unsigned short vt = pv->vt ^ VT_ARRAY;
+    
+    ss << L"データ型：";
+
+    if (vt == VT_I4)
+    {
+        ss << L"Long\n";
+
+        if (uiDims == 2)
+        {
+            long lIndex[] = { 0, 0 };
+
+            for (long i = plLbound[0]; i <= plUbound[0]; ++i)
+            {
+                lIndex[0] = i;
+
+                for (long j = plLbound[1]; j <= plUbound[1]; ++j)
+                {
+                    lIndex[1] = j;
+                    int iValue(0);
+                    hResult = SafeArrayGetElement(pv->parray, lIndex, &iValue);
+
+                    ss << iValue << L"\n";
+                }
+            }
+        }
+        else
+        {
+            long* plIndex = new long[uiDims];
+
+            for (UINT i = 0; i <= uiDims; ++i)
+            {
+                plIndex[i] = plLbound[i];
+            }
+
+            for (long i = plLbound[0]; i <= plUbound[0]; ++i)
+            {
+                plIndex[0] = i;
+
+                int iValue(0);
+                hResult = SafeArrayGetElement(pv->parray, plIndex, &iValue);
+
+                ss << iValue << L"\n";
+            }
+
+            delete[] plIndex;
+        }
+    }
+    else if (vt == VT_BSTR)
+    {
+        ss << L"String\n";
+
+        if (uiDims == 1)
+        {
+            for (long i = plLbound[0]; i <= plUbound[0]; ++i)
+            {
+                BSTR bstr = SysAllocString(L"");
+
+                SafeArrayGetElement(pv->parray, &i, &bstr);
+
+                std::wstring ws = std::wstring(bstr, SysStringLen(bstr));
+
+                ss << ws.c_str() << L"\n";
+
+                SysFreeString(bstr);
+            }
+        }
+        else
+        {
+            ss << L"not 1 Dimensions.\n";
+        }
+    }
+    else
+    {
+        ss << L"Other Data Type.\n";
+    }
+
+    delete[] plUbound;
+    delete[] plLbound;
+
+    MessageBox(NULL, ss.str().c_str(), L"SetArrayV", MB_OK | MB_ICONINFORMATION);
+
+    return;
+}
