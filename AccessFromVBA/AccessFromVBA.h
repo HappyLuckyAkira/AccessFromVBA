@@ -37,4 +37,18 @@ extern "C" {
 	ACCESSFROMVBA_API void WINAPI GetArrayAD(LPSAFEARRAY* ppsa);
     ACCESSFROMVBA_API void WINAPI GetArrayV(LPVARIANT pv);
     ACCESSFROMVBA_API void WINAPI SetArrayV(const LPVARIANT pv);
+
+	#pragma pack(4)
+    struct SamplePack
+    {
+        short   nValue;
+        double  dValue;
+        long    lValue;
+    };
+	#pragma pack()
+
+    ACCESSFROMVBA_API void WINAPI GetStructP(SamplePack* pst);
+    ACCESSFROMVBA_API void WINAPI GetStructPArray(LPSAFEARRAY* ppsa);
+    ACCESSFROMVBA_API void WINAPI SetStructP(const SamplePack* pst);
+    ACCESSFROMVBA_API void WINAPI SetStructPArray(const LPSAFEARRAY* ppsa);
 }

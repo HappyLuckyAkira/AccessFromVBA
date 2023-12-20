@@ -16,3 +16,7 @@ EXPORTS
 	GetArrayAD
 	GetArrayV
 	SetArrayV
+	GetStructP
+    GetStructPArray
+    SetStructP
+    SetStructPArray

@@ -935,3 +935,141 @@ ACCESSFROMVBA_API void WINAPI SetArrayV(const LPVARIANT pv)
 
     return;
 }
+
+ACCESSFROMVBA_API void WINAPI SetStructP(const SamplePack* pst)
+{
+    std::wstringstream ss;
+
+    ss << pst->nValue << L"\n"
+       << pst->dValue << L"\n"
+       << pst->lValue << L"\n";
+
+    MessageBox(NULL, ss.str().c_str(), L"SetStructP", MB_OK | MB_ICONINFORMATION);
+
+    return;
+}
+
+ACCESSFROMVBA_API void WINAPI SetStructPArray(const LPSAFEARRAY* ppsa)
+{
+    //格納されているデータ型の確認
+    VARTYPE vt;
+    HRESULT hResult = SafeArrayGetVartype(*ppsa, &vt);
+
+    if (SUCCEEDED(hResult))
+    {
+        //VBAから構造体を渡した場合、hResult は、E_INVALIDARG が返るので
+        //FAILED(hResult) で弾かない。
+        return;
+    }
+
+    //要素のサイズ
+    UINT uiElemBytes = SafeArrayGetElemsize(*ppsa);
+
+    if (uiElemBytes != sizeof(SamplePack))
+    {
+        //構造体のサイズと異なる場合、処理しない。
+        return;
+    }
+
+    //次元数
+    UINT uiDims = SafeArrayGetDim(*ppsa);
+
+    std::wstringstream ss;
+
+    for (UINT i = 1; i <= uiDims; ++i)
+    {
+        LONG lLBound, lUBound;
+        hResult = SafeArrayGetLBound(*ppsa, i, &lLBound);
+        hResult = SafeArrayGetUBound(*ppsa, i, &lUBound);
+
+        ss << i << L"次元\n"
+           << L"　LBound：" << lLBound << L"\n"
+           << L"　UBound：" << lUBound << L"\n";
+    }
+
+    ss << L"データ型：SamplePack\n";
+
+    if (uiDims == 1)
+    {
+        LONG lIndex;
+
+        LONG lLBound;
+        LONG lUBound;
+
+        hResult = SafeArrayGetLBound(*ppsa, 1, &lLBound);
+        hResult = SafeArrayGetUBound(*ppsa, 1, &lUBound);
+
+        for (LONG i = lLBound; i <= lUBound; ++i)
+        {
+            SamplePack sp;
+            hResult = SafeArrayGetElement(*ppsa, &i, &sp);
+
+            ss << sp.nValue << L"\n"
+               << sp.dValue << L"\n"
+               << sp.lValue << L"\n"
+               << L"\n";
+        }
+    }
+
+    MessageBox(NULL, ss.str().c_str(), L"SetStructPArray", MB_OK | MB_ICONINFORMATION);
+
+    return;
+}
+
+ACCESSFROMVBA_API void WINAPI GetStructP(SamplePack* pst)
+{
+    pst->nValue *= 2;
+    pst->dValue *= 2;
+    pst->lValue *= 2;
+
+    return;
+}
+
+ACCESSFROMVBA_API void WINAPI GetStructPArray(LPSAFEARRAY* ppsa)
+{
+    //格納されているデータ型の確認
+    VARTYPE vt;
+    HRESULT hResult = SafeArrayGetVartype(*ppsa, &vt);
+
+    if (SUCCEEDED(hResult))
+    {
+        //VBAから構造体を渡した場合、hResult は、E_INVALIDARG が返るので
+        //FAILED(hResult) で弾かない。
+        return;
+    }
+
+    //要素のサイズ
+    UINT uiElemBytes = SafeArrayGetElemsize(*ppsa);
+
+    if (uiElemBytes != sizeof(SamplePack))
+    {
+        //構造体のサイズと異なる場合、処理しない。
+        return;
+    }
+
+    //次元数
+    UINT uiDims = SafeArrayGetDim(*ppsa);
+
+    if (uiDims == 1)
+    {
+        LONG lLBound;
+        LONG lUBound;
+
+        hResult = SafeArrayGetLBound(*ppsa, 1, &lLBound);
+        hResult = SafeArrayGetUBound(*ppsa, 1, &lUBound);
+
+        for (LONG i = lLBound; i <= lUBound; ++i)
+        {
+            SamplePack sp;
+            hResult = SafeArrayGetElement(*ppsa, &i, &sp);
+
+            sp.nValue *= 2;
+            sp.dValue *= 2;
+            sp.lValue *= 2;
+
+            hResult = SafeArrayPutElement(*ppsa, &i, &sp);
+        }
+    }
+
+    return;
+}
