@@ -20,3 +20,6 @@ EXPORTS
     GetStructPArray
     SetStructP
     SetStructPArray
+    
+    SetStructWithString
+    GetStructWithString

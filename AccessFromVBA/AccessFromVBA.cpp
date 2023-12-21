@@ -1073,3 +1073,51 @@ ACCESSFROMVBA_API void WINAPI GetStructPArray(LPSAFEARRAY* ppsa)
 
     return;
 }
+
+ACCESSFROMVBA_API void WINAPI SetStructWithString(const WithStringStruct* pStruct)
+{
+    std::wstringstream ss;
+	ss << L"データ型：WithStringStruct\n";
+	ss << pStruct->name.bstrVal << L"\n";
+	MessageBox(NULL, ss.str().c_str(), L"SetStructWithString", MB_OK | MB_ICONINFORMATION);
+
+	return;
+
+}
+ACCESSFROMVBA_API void WINAPI GetStructWithString(WithStringStruct* pStruct)
+{
+    std::wstringstream ss;
+	ss << L"データ型：WithStringStruct\n";
+	ss << pStruct->name.vt << L"\n";
+//	MessageBox(NULL, ss.str().c_str(), L"GetStructWithString", MB_OK | MB_ICONINFORMATION);
+	pStruct->string_length = 10;
+
+	std::wstring ws(L"GetStructWithString返却データ");
+	
+	unsigned short vt = pStruct->name.vt;
+
+	VariantClear(&pStruct->name);
+
+	if (vt == (VT_BSTR | VT_BYREF))
+	{
+		//VBAから、
+		//GetStringByParam(String)
+		//で呼ばれた場合
+		pStruct->name.vt = vt;
+
+		BSTR bs = SysAllocString(ws.c_str());
+		INT iResult = SysReAllocString(pStruct->name.pbstrVal, bs);
+		SysFreeString(bs);
+	}
+	else if ((vt == VT_BSTR) || (vt == VT_EMPTY))
+	{
+		//VBAから、
+		//GetStringByParam(Variant)
+		//で呼ばれた場合
+		pStruct->name.vt = VT_BSTR;
+		pStruct->name.bstrVal = SysAllocString(ws.c_str());
+
+	}
+
+	return;
+}

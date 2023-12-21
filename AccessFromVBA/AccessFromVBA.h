@@ -51,4 +51,13 @@ extern "C" {
     ACCESSFROMVBA_API void WINAPI GetStructPArray(LPSAFEARRAY* ppsa);
     ACCESSFROMVBA_API void WINAPI SetStructP(const SamplePack* pst);
     ACCESSFROMVBA_API void WINAPI SetStructPArray(const LPSAFEARRAY* ppsa);
+
+	struct WithStringStruct
+	{
+		VARIANT name;
+		int string_length;
+	};
+    ACCESSFROMVBA_API void WINAPI SetStructWithString(const WithStringStruct* pStruct);
+    ACCESSFROMVBA_API void WINAPI GetStructWithString(WithStringStruct* pStruct);
+
 }
